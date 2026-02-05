@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Luka Bakar - Rule of Nine</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #eff6ff);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    h1, h2 {
+      color: #0056b3;
+    }
+
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      transition: opacity 1s ease;
+    }
+
+    #welcome img {
+      width: 280px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.4s ease;
+    }
+
+    #welcome img:hover {
+      transform: scale(1.05);
+    }
+
+    #welcome button {
+      margin-top: 25px;
+      padding: 14px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #welcome button:hover {
+      background-color: #0056b3;
+      transform: scale(1.08);
+    }
+
+    #calculator {
+      display: none;
+      max-width: 850px;
+      margin: 50px auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .body-map {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 25px auto;
+    }
+
+    .area {
+      background-color: #eef2f7;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: normal;
+    }
+
+    .area:hover {
+      background-color: #d0e3ff;
+      transform: scale(1.05);
+    }
+
+    .selected {
+      background-color: #ffcccc;
+      border: 3px solid #000;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      max-width: 300px;
+      padding: 10px;
+      margin: 10px 0 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .calc-btn {
+      background-color: #007bff;
+    }
+
+    .calc-btn:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .reset-btn {
+      background-color: #dc3545;
+    }
+
+    .reset-btn:hover {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+
+    #fluid-result {
+      font-size: 16px;
+      margin-top: 20px;
+      background: #f1f8ff;
+      padding: 15px;
+      border-radius: 10px;
+      display: inline-block;
+      text-align: left;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <section id="welcome">
+    <h1>🔥 Kalkulator Luka Bakar (Rule of Nine)</h1>
+    <p>Membantu perawat menghitung kebutuhan cairan pasien luka bakar secara cepat dan akurat.</p>
+    <img src="https://i.ibb.co/sdzmsJdh/manusia.jpg" alt="Ilustrasi tubuh manusia" />
+    <button onclick="startCalculator()">Mulai Hitung Luka Bakar</button>
+  </section>
+
+  <section id="calculator">
+    <h2>Perhitungan Luas Luka Bakar</h2>
+    <p>Klik bagian tubuh yang mengalami luka bakar.</p>
+
+    <div class="body-map">
+      <div class="area" data-value="4.5"><div class="icon">🧠</div>Kepala Depan (4.5%)</div>
+        <div class="area" data-value="9"><div class="icon">❤️</div>Dada Depan (9%)</div>
+        <div class="area" data-value="9"><div class="icon">🫀</div>Perut Depan (9%)</div>
+        <div class="area" data-value="4.5"><div class="icon">💪</div>Lengan Kanan Depan (4.5%)</div>
+        <div class="area" data-value="4.5"><div class="icon">💪</div>Lengan Kiri Depan (4.5%)</div>
+        <div class="area" data-value="9"><div class="icon">🦵</div>Kaki Kanan Depan (9%)</div>
+        <div class="area" data-value="9"><div class="icon">🦵</div>Kaki Kiri Depan (9%)</div>
+        <div class="area" data-value="1"><div class="icon">⚡</div>Area Kemaluan (1%)</div>
+        <div class="area" data-value="4.5"><div class="icon">🧠</div>Kepala Belakang (4.5%)</div>
+        <div class="area" data-value="9"><div class="icon">🦴</div>Punggung Atas (9%)</div>
+        <div class="area" data-value="9"><div class="icon">🦴</div>Punggung Bawah (9%)</div>
+        <div class="area" data-value="4.5"><div class="icon">💪</div>Lengan Kanan Belakang (4.5%)</div>
+        <div class="area" data-value="4.5"><div class="icon">💪</div>Lengan Kiri Belakang (4.5%)</div>
+        <div class="area" data-value="9"><div class="icon">🦵</div>Kaki Kanan Belakang (9%)</div>
+        <div class="area" data-value="9"><div class="icon">🦵</div>Kaki Kiri Belakang (9%)</div>
+    </div>
+
+    <label for="weight"><b>Berat Badan (kg):</b></label><br />
+    <input type="number" id="weight" min="1" placeholder="Masukkan berat badan" />
+
+    <div class="button-container">
+      <button class="calc-btn" onclick="calculateFluids()">Hitung Cairan</button>
+      <button class="reset-btn" onclick="resetSelection()">Reset</button>
+    </div>
+
+    <h3>Hasil Perhitungan</h3>
+    <p id="fluid-result"></p>
+  </section>
+
+  <footer>© 2025 Kalkulator Luka Bakar – Didesain untuk edukasi tenaga kesehatan</footer>
+
+  <script>
+    function startCalculator() {
+      document.getElementById("welcome").style.display = "none";
+      document.getElementById("calculator").style.display = "block";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const areas = document.querySelectorAll(".area");
+      areas.forEach((area) => {
+        area.addEventListener("click", () => {
+          area.classList.toggle("selected");
+        });
+      });
+    });
+
+    function calculateFluids() {
+      const weight = document.getElementById("weight").value;
+      const selectedAreas = document.querySelectorAll(".area.selected");
+      let totalPercent = 0;
+
+      selectedAreas.forEach((area) => {
+        totalPercent += parseFloat(area.dataset.value);
+      });
+
+      if (!weight || weight <= 0) {
+        alert("Masukkan berat badan yang valid!");
+        return;
+      }
+
+      if (totalPercent === 0) {
+        alert("Pilih setidaknya satu area luka bakar!");
+        return;
+      }
+
+      const totalFluids = 4 * weight * totalPercent;
+      const first8Hours = totalFluids / 2;
+      const next16Hours = totalFluids / 2;
+
+      let fluidType = "";
+      if (totalPercent < 15) {
+        fluidType = `
+        💧 <b>Kristaloid ringan:</b><br>
+        • <b>Ringer Laktat (RL):</b> 1–2 mL/kg/jam.<br>
+        • <b>NaCl 0.9%:</b> alternatif jika RL tidak tersedia.<br>
+        • <i>Digunakan untuk luka bakar ringan tanpa syok.</i>
+        `;
+      } else if (totalPercent >= 15 && totalPercent <= 30) {
+        fluidType = `
+        💉 <b>Kristaloid utama:</b><br>
+        • <b>Ringer Laktat (RL):</b> 4 mL/kg/% luas luka bakar (Parkland formula).<br>
+        • <b>Dextrose 5%:</b> tambahkan bila anak-anak atau hipoglikemia.<br>
+        • <i>½ cairan diberikan 8 jam pertama, sisanya 16 jam berikutnya.</i>
+        `;
+      } else if (totalPercent > 30 && totalPercent <= 50) {
+        fluidType = `
+        🧴 <b>Kombinasi cairan:</b><br>
+        • <b>Ringer Laktat:</b> 2–4 mL/kg/% luas luka bakar.<br>
+        • <b>Koloid (Gelatin/Albumin 5%):</b> 0.5–1 mL/kg/% luas luka bakar, dimulai setelah 8–12 jam.<br>
+        • <i>Untuk mempertahankan tekanan onkotik plasma.</i>
+        `;
+      } else {
+        fluidType = `
+        💊 <b>Koloid dominan + Kristaloid pendukung:</b><br>
+        • <b>Albumin 5%:</b> 1 mL/kg/% luas luka bakar (setelah 12–24 jam).<br>
+        • <b>Ringer Laktat:</b> 2 mL/kg/% luas luka bakar.<br>
+        • <i>Untuk luka bakar berat dengan kehilangan cairan besar atau syok.</i>
+        `;
+      }
+
+      document.getElementById("fluid-result").innerHTML = `
+        🔥 <b>Total luas luka bakar:</b> ${totalPercent.toFixed(1)}%<br>
+        💧 <b>Kebutuhan cairan total (24 jam):</b> ${totalFluids.toLocaleString()} mL<br>
+        ⏱️ <b>8 jam pertama:</b> ${first8Hours.toLocaleString()} mL<br>
+        ⏱️ <b>16 jam berikutnya:</b> ${next16Hours.toLocaleString()} mL<br><br>
+        🧴 <b>Jenis & Dosis Cairan Disarankan:</b><br>${fluidType}
+      `;
+    }
+
+    function resetSelection() {
+      document.querySelectorAll(".area").forEach((area) => {
+        area.classList.remove("selected");
+      });
+      document.getElementById("weight").value = "";
+      document.getElementById("fluid-result").innerHTML = "";
+    }
+  </script>
+</body>
+</html>

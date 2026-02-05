@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intro Luka Bakar</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#dbeafe,#eff6ff);
+  padding:20px;
+  color:#003366;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  color:#0056b3;
+  margin-bottom:30px;
+}
+
+/* ====== TABLE STYLE ====== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:30px;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+th,td{
+  padding:14px;
+  text-align:left;
+}
+
+th{
+  color:white;
+  font-size:18px;
+}
+
+/* warna tabel */
+.dewasa th{background:#007bff;}
+.anak th{background:#28a745;}
+.syok th{background:#ff5733;}
+
+.dewasa td{background:#eaf4ff;}
+.anak td{background:#e9f9ee;}
+.syok td{background:#ffe9e3;}
+
+.startBtn{
+  display:block;
+  margin:40px auto;
+  padding:18px 40px;
+  font-size:18px;
+  font-weight:bold;
+  border:none;
+  border-radius:12px;
+  background:#0056b3;
+  color:white;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.startBtn:hover{
+  transform:scale(1.08);
+  background:#003f82;
+}
+
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🔥 SIGAP </h1>
+
+<h1> (SISTEM IDENTIFIKASI GAWAT DAN ANALIIS PASIEN LUKA BAKAR) </h1>
+
+<!-- TABEL 1 -->
+<table class="dewasa">
+<tr><th colspan="2">Luka Bakar Dewasa</th></tr>
+<tr><td>Metode Penilaian</td><td>Rule of Nine</td></tr>
+<tr><td>Kebutuhan Cairan</td><td>Rumus Parkland: 4 ml x BB x %TBSA</td></tr>
+<tr><td>Distribusi Cairan</td><td>50% 8 jam pertama, 50% 16 jam berikutnya</td></tr>
+<tr><td>Risiko</td><td>Dehidrasi, gagal organ, syok hipovolemik</td></tr>
+</table>
+
+<!-- TABEL 2 -->
+<table class="anak">
+<tr><th colspan="2">Luka Bakar Anak</th></tr>
+<tr><td>Metode Penilaian</td><td>Lund & Browder Chart</td></tr>
+<tr><td>Kebutuhan Cairan</td><td>Rumus Parkland + cairan maintenance</td></tr>
+<tr><td>Risiko</td><td>Kehilangan cairan lebih cepat</td></tr>
+<tr><td>Monitoring</td><td>Urine output & tanda vital wajib dipantau</td></tr>
+</table>
+
+<!-- TABEL 3 -->
+<table class="syok">
+<tr><th colspan="2">Risiko Syok Hipovolemik</th></tr>
+<tr><td>Penyebab</td><td>Kehilangan cairan masif akibat luka bakar</td></tr>
+<tr><td>Tanda Awal</td><td>Takikardia, hipotensi, kulit pucat dingin</td></tr>
+<tr><td>Komplikasi</td><td>Gagal organ & kematian</td></tr>
+<tr><td>Pencegahan</td><td>Resusitasi cairan cepat dan tepat</td></tr>
+</table>
+
+<button class="startBtn" onclick="location.href='index.html'">
+START ▶ Masuk Menu Kalkulator
+</button>
+
+</div>
+</body>
+</html>

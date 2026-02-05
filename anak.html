@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Kalkulator Luka Bakar Anak (Lund & Browder + Parkland)</title>
+<style>
+:root {
+  --utama:#2a9d8f;
+  --muda:#e9f8f7;
+  --teks:#2b2b2b;
+  --putih:#ffffff;
+  --border:#c9e8e4;
+}
+body {
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(to bottom,#f3fcfc,#d7f0ec);
+  color:var(--teks);
+  margin:0;
+  padding:0;
+}
+.container {
+  max-width:950px;
+  margin:30px auto;
+  background:var(--putih);
+  border-radius:18px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.1);
+  padding:25px;
+}
+header { text-align:center; margin-bottom:18px; }
+header h1 { color:var(--utama); font-size:1.8rem; margin:0; }
+header p { margin:6px 0 0; color:#444; font-size:0.95rem; }
+
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+@media(max-width:800px){ .grid{ grid-template-columns:1fr; } }
+
+label { font-weight:600; display:block; margin-top:10px; }
+input[type=number] { width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; margin-top:6px; box-sizing:border-box; }
+button { width:100%; background:var(--utama); color:white; border:none; border-radius:10px; padding:12px; font-weight:600; margin-top:12px; cursor:pointer; }
+button:hover { background:#21867a; }
+
+.section-title { margin-top:6px; font-weight:700; color:var(--utama); border-bottom:2px solid var(--utama); padding-bottom:6px; }
+.group { background:var(--muda); border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px; }
+.group h4 { margin:0; font-size:1rem; color:var(--utama); }
+.area-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.area-btn { background:white; border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:0.92rem; transition:0.12s; user-select:none; }
+.area-btn.active { background:var(--utama); color:white; border-color:var(--utama); }
+
+.result-box { background:#f8fdfc; border-left:4px solid var(--utama); padding:15px; border-radius:10px; margin-top:18px; }
+.result-box h3 { color:var(--utama); margin:0 0 8px 0; }
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th, td { border:1px solid #ddd; padding:8px; text-align:center; font-size:0.95rem; }
+th { background:var(--utama); color:white; }
+.note { font-size:0.85rem; color:#555; margin-top:5px; }
+pre { background:#f1f8f7; padding:10px; border-left:4px solid var(--utama); border-radius:6px; white-space:pre-wrap; margin-top:10px; }
+.small { font-size:0.9rem; color:#444; margin-top:6px; }
+
+.controls-row { display:flex; gap:8px; margin-top:8px; }
+.controls-row button { width:auto; padding:8px 12px; font-size:0.92rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Kalkulator Luka Bakar Anak</h1>
+    <p>Metode Lund–Browder (pediatrik) + Rumus Parkland — faktor default: <strong>3.0 mL/kg/%TBSA</strong>. Maintenance otomatis (Holliday–Segar).</p>
+  </header>
+
+  <div class="grid">
+    <div>
+      <label>Usia Anak (tahun)</label>
+      <input type="number" id="age" min="0" step="0.1" value="5" onchange="onAgeChange()">
+
+      <label>Berat Badan (kg)</label>
+      <input type="number" id="weight" min="1" step="0.1" value="15">
+
+      <label>Faktor Parkland (mL/kg/%TBSA)</label>
+      <input type="number" id="factor" step="0.1" value="3.0">
+
+      <div class="small">*Faktor default 3.0. Dapat diubah bila diperlukan.</div>
+    </div>
+
+    <div>
+      <div class="section-title">Pilih Area Luka Bakar (Lund & Browder)</div>
+      <div class="controls-row">
+        <button onclick="selectAll(false)">Reset Semua</button>
+        <button onclick="selectAll(true)">Pilih Semua</button>
+      </div>
+
+      <div id="areas" style="margin-top:10px;"></div>
+
+      <!-- TOMBOL DIPINDAHKAN KE SINI -->
+      <button onclick="calculate()">💧 Hitung Kebutuhan Cairan</button>
+      <div class="note">Maintenance dihitung otomatis menggunakan rumus Holliday–Segar.</div>
+    </div>
+  </div>
+
+  <div id="result" style="display:none;" class="result-box">
+    <h3>💡 Hasil Perhitungan</h3>
+    <div id="resultText"></div>
+
+    <h4>Rincian Jenis & Jumlah Cairan</h4>
+    <table>
+      <thead>
+        <tr><th>Kategori</th><th>Jenis Cairan</th><th>Jumlah (mL)</th><th>Keterangan</th></tr>
+      </thead>
+      <tbody id="resultTable"></tbody>
+    </table>
+
+    <h4>📋 Ringkasan Waktu Pemberian</h4>
+    <pre id="resultSummary"></pre>
+
+    <p class="note">Sumber: Tabel Lund & Browder pediatrik.</p>
+  </div>
+</div>
+
+<script>
+/* === SCRIPT IDENTIK DENGAN YANG ANDA BERIKAN === */
+
+/* DATA PERSENTASE LUND–BROWDER PEDIATRIK */
+const LB = {
+  "0-1": {
+    kepala:19, leher:2, badan_depan:13, badan_belakang:13,
+    r_buttock:2.5, l_buttock:2.5,
+    r_upper_arm:4, r_lower_arm:3, r_hand:2.5,
+    l_upper_arm:4, l_lower_arm:3, l_hand:2.5,
+    r_thigh:5.5, r_lower_leg:5, r_foot:3.5,
+    l_thigh:5.5, l_lower_leg:5, l_foot:3.5,
+    perineum:1
+  },
+  "1-4": {
+    kepala:17, leher:2, badan_depan:13, badan_belakang:13,
+    r_buttock:2.5, l_buttock:2.5,
+    r_upper_arm:4, r_lower_arm:3, r_hand:2.5,
+    l_upper_arm:4, l_lower_arm:3, l_hand:2.5,
+    r_thigh:6.5, r_lower_leg:5, r_foot:3.5,
+    l_thigh:6.5, l_lower_leg:5, l_foot:3.5,
+    perineum:1
+  },
+  "5-9": {
+    kepala:13, leher:2, badan_depan:13, badan_belakang:13,
+    r_buttock:2.5, l_buttock:2.5,
+    r_upper_arm:4, r_lower_arm:3, r_hand:2.5,
+    l_upper_arm:4, l_lower_arm:3, l_hand:2.5,
+    r_thigh:8, r_lower_leg:5.5, r_foot:3.5,
+    l_thigh:8, l_lower_leg:5.5, l_foot:3.5,
+    perineum:1
+  },
+  "10-14": {
+    kepala:11, leher:2, badan_depan:13, badan_belakang:13,
+    r_buttock:2.5, l_buttock:2.5,
+    r_upper_arm:4, r_lower_arm:3, r_hand:2.5,
+    l_upper_arm:4, l_lower_arm:3, l_hand:2.5,
+    r_thigh:8.5, r_lower_leg:6, r_foot:3.5,
+    l_thigh:8.5, l_lower_leg:6, l_foot:3.5,
+    perineum:1
+  },
+  "15": {
+    kepala:9, leher:2, badan_depan:13, badan_belakang:13,
+    r_buttock:2.5, l_buttock:2.5,
+    r_upper_arm:4, r_lower_arm:3, r_hand:2.5,
+    l_upper_arm:4, l_lower_arm:3, l_hand:2.5,
+    r_thigh:9, r_lower_leg:6.5, r_foot:3.5,
+    l_thigh:9, l_lower_leg:6.5, l_foot:3.5,
+    perineum:1
+  }
+};
+
+const translate = {
+  kepala:"Kepala",
+  leher:"Leher",
+  badan_depan:"Dada & Perut (Depan)",
+  badan_belakang:"Punggung (Belakang)",
+  r_buttock:"Bokong Kanan",
+  l_buttock:"Bokong Kiri",
+  r_upper_arm:"Lengan Atas Kanan",
+  r_lower_arm:"Lengan Bawah Kanan",
+  r_hand:"Tangan Kanan",
+  l_upper_arm:"Lengan Atas Kiri",
+  l_lower_arm:"Lengan Bawah Kiri",
+  l_hand:"Tangan Kiri",
+  r_thigh:"Paha Kanan",
+  r_lower_leg:"Betis Kanan",
+  r_foot:"Kaki Kanan",
+  l_thigh:"Paha Kiri",
+  l_lower_leg:"Betis Kiri",
+  l_foot:"Kaki Kiri",
+  perineum:"Perineum"
+};
+
+const groupsUI = {
+  "Kepala & Leher": ["kepala","leher"],
+  "Badan (Depan & Belakang)": ["badan_depan","badan_belakang","r_buttock","l_buttock"],
+  "Ekstremitas Atas (Kanan)": ["r_upper_arm","r_lower_arm","r_hand"],
+  "Ekstremitas Atas (Kiri)": ["l_upper_arm","l_lower_arm","l_hand"],
+  "Ekstremitas Bawah (Kanan)": ["r_thigh","r_lower_leg","r_foot"],
+  "Ekstremitas Bawah (Kiri)": ["l_thigh","l_lower_leg","l_foot"],
+  "Perineum": ["perineum"]
+};
+
+let selected = {};
+
+function getAgeGroup(age){
+  if(age < 1) return "0-1";
+  if(age < 5) return "1-4";
+  if(age < 10) return "5-9";
+  if(age < 15) return "10-14";
+  return "15";
+}
+
+function onAgeChange(){ renderAreas(); }
+
+function renderAreas(){
+  const age = parseFloat(document.getElementById("age").value);
+  const group = getAgeGroup(age);
+  const chart = LB[group];
+  const container = document.getElementById("areas");
+  container.innerHTML = "";
+
+  Object.entries(groupsUI).forEach(([title, parts]) => {
+    const box = document.createElement("div");
+    box.className = "group";
+    const h = document.createElement("h4");
+    h.textContent = title;
+    box.appendChild(h);
+
+    const areaDiv = document.createElement("div");
+    areaDiv.className = "area-buttons";
+
+    parts.forEach(p => {
+      const pct = chart[p] || 0;
+      const label = translate[p] || p;
+
+      const btn = document.createElement("div");
+      btn.className = "area-btn";
+      btn.textContent = `${label} (${pct}%)`;
+
+      if(selected[p]) btn.classList.add("active");
+
+      btn.onclick = () => {
+        selected[p] = !selected[p];
+        btn.classList.toggle("active", selected[p]);
+      };
+
+      areaDiv.appendChild(btn);
+    });
+
+    box.appendChild(areaDiv);
+    container.appendChild(box);
+  });
+}
+
+function selectAll(v){
+  const age = parseFloat(document.getElementById("age").value);
+  const group = getAgeGroup(age);
+  const chart = LB[group];
+
+  Object.values(groupsUI).flat().forEach(k => {
+    if(chart[k] !== undefined) selected[k] = v;
+  });
+
+  renderAreas();
+}
+
+function calcTbsa(){
+  const age = parseFloat(document.getElementById("age").value);
+  const group = getAgeGroup(age);
+  const chart = LB[group];
+  let total = 0;
+
+  for(const k in selected){
+    if(selected[k] && chart[k] !== undefined){
+      total += chart[k];
+    }
+  }
+  return Math.round(total * 10) / 10;
+}
+
+function hollidaySegar(kg){
+  if(kg <= 10) return kg * 100;
+  if(kg <= 20) return 1000 + (kg - 10) * 50;
+  return 1500 + (kg - 20) * 20;
+}
+
+function calculate(){
+  const weight = parseFloat(document.getElementById("weight").value);
+  const tbsa = calcTbsa();
+  let factor = parseFloat(document.getElementById("factor").value);
+  if(isNaN(factor) || factor <= 0) factor = 3.0;
+
+  if(!weight || tbsa <= 0){
+    alert("Masukkan berat badan dan pilih area luka bakar!");
+    return;
+  }
+
+  const resus = factor * weight * tbsa;
+  const maintenance = hollidaySegar(weight);
+  const total = resus + maintenance;
+
+  const period = [
+    { label:"0–8 jam pertama", value:resus*0.5, fluid:"Ringer Laktat (RL)" },
+    { label:"8–16 jam", value:resus*0.25, fluid:"Ringer Laktat (RL)" },
+    { label:"16–24 jam", value:resus*0.25, fluid:"RL + Koloid" }
+  ];
+
+  const fluids = [
+    { kategori:"Kristaloid", jenis:"Ringer Laktat (RL)", jumlah:Math.round(resus), ket:`Resusitasi Parkland (${factor} mL/kg/%TBSA)` },
+    { kategori:"Maintenance", jenis:"D5% + RL", jumlah:Math.round(maintenance), ket:"Holliday–Segar 24 jam" },
+    { kategori:"Koloid", jenis:"Albumin 5%", jumlah:Math.round(resus*0.25), ket:"Dipertimbangkan setelah 24 jam" },
+    { kategori:"Total", jenis:"Total 24 jam", jumlah:Math.round(total), ket:"Resusitasi + maintenance" }
+  ];
+
+  document.getElementById("result").style.display = "block";
+  document.getElementById("resultText").innerHTML = `
+    <p><b>Luas Luka Bakar (TBSA):</b> ${tbsa}%</p>
+    <p><b>Faktor Parkland:</b> ${factor} mL/kg/%TBSA</p>
+    ${period.map(p => `<p><b>${p.label}:</b> ${Math.round(p.value)} mL (${p.fluid})</p>`).join("")}
+  `;
+
+  document.getElementById("resultTable").innerHTML =
+    fluids.map(f => `<tr><td>${f.kategori}</td><td>${f.jenis}</td><td>${f.jumlah}</td><td>${f.ket}</td></tr>`).join("");
+
+  document.getElementById("resultSummary").textContent =
+    `TBSA: ${tbsa}%\nFaktor: ${factor} mL/kg/%TBSA\n` +
+    `0–8 jam: ${Math.round(period[0].value)} mL\n` +
+    `8–16 jam: ${Math.round(period[1].value)} mL\n` +
+    `16–24 jam: ${Math.round(period[2].value)} mL\n` +
+    `Total 24 jam: ${Math.round(total)} mL`;
+}
+
+renderAreas();
+</script>
+</body>
+</html>
